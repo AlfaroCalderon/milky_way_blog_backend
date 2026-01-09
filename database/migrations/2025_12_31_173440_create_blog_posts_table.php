@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('summary', 150);
             $table->string('author', 100);
             $table->enum('category', ['technology','science','lifestyle','travel','education']);
+            $table->string('img_url', 2048);
             $table->text('main_content');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

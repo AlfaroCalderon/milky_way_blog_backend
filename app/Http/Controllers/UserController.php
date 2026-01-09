@@ -142,8 +142,19 @@ class UserController extends Controller
 
         try {
              $pagination = $request->input('per_page', 15);
+             $search = $request->input('search');
 
-             $users = User::select('id','name','lastname','email', 'is_active', 'roles', 'last_login', 'created_at', 'updated_at')->paginate($pagination);
+             $query = User::select('id','name','lastname','email', 'is_active', 'roles', 'last_login', 'created_at', 'updated_at');
+
+             if($search){
+                $query->where(function($q) use ($search){
+                    $q->where('name','like',"%{$search}%")
+                    ->orWhere('lastname','like',"%{$search}%")
+                    ->orWhere('email','like',"%{$search}%");
+                });
+             }
+
+             $users = $query->paginate($pagination);
 
              return response()->json([
                 'status' => 'success',
@@ -168,7 +179,7 @@ class UserController extends Controller
             if(!$user){
                 return response()->json([
                     'status' => 'account_not_found',
-                    'message' => 'The account cound not be found'
+                    'message' => 'The account could not be found'
                 ],404);
             }
 
@@ -194,7 +205,7 @@ class UserController extends Controller
         $validated = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:60|min:3',
             'lastname' => 'sometimes|string|max:60|min:3',
-            'email' => 'sometimes|email|unique:users',
+            'email' => 'sometimes|email',
             'password' => 'sometimes|string|min:8|confirmed',
             'is_active' => 'sometimes|boolean',
             'roles' => 'sometimes|in:manager,registered_user'
@@ -233,6 +244,134 @@ class UserController extends Controller
                 'data' => $user->makeHidden(['password','login_attemps'])
             ], 200);
 
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'database_error',
+                'message' => 'An error has arisen '.$error->getMessage()
+            ],500);
+        }
+    }
+
+    public function deleteUser(int $id){
+        try {
+
+            $user = User::find($id);
+
+            if(!$user){
+                return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'User not found'
+                ],404);
+            }
+
+            $user->update(['is_active' => false]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User has been deactivated'
+            ], 200);
+
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'database_error',
+                'message' => 'An error has arisen'.$error->getMessage()
+            ],500);
+        }
+    }
+
+    public function refreshToken(Request $request, JWTService $jWTService){
+
+        $validated = Validator::make($request->all(), [
+            'refresh_token' => 'required|string'
+        ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'status' => 'validation_error',
+                'message' => $validated->errors()
+            ],401);
+        }
+
+        try {
+
+        $decode = $jWTService->decodeRefreshToken($request->refresh_token);
+
+        if($decode->type !== 'refresh_access_token'){
+            return response()->json([
+                'status' => 'invalid_type',
+                'message' => 'Invalid refresh access token type'
+            ],401);
+        }
+
+        $user = User::find($decode->user_id);
+
+        if(!$user){
+            return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'User not found'
+            ], 404);
+        }
+
+        if(!$user->is_active){
+            return response()->json([
+                    'status' => 'account_unactive',
+                    'message' => 'The account is unactive, Please contact support'
+            ],401);
+        }
+
+        $tokenPayload = [
+                'user_id' => $user->id,
+                'user_rol' => $user->roles,
+                'user_email' => $user->email
+        ];
+
+        $token = $jWTService->generateToken($tokenPayload);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Token refreshed successfully',
+            'access_token' => $token
+        ],200);
+        
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'database_error',
+                'message' => 'An error has arisen '.$error->getMessage()
+            ],500);
+        }
+       
+    }
+
+    public function validateAccessToken(Request $request, JWTService $jWTService){
+        $validated = Validator::make($request->all, [
+            'access_token' => 'required|string'
+        ]);
+
+        if($validated->fails()){
+            return response()->json([
+                'status' => 'validation_error',
+                'message' => $validated->errors()
+            ],401);
+        }
+
+        try {
+
+         $decode = $jWTService->decodeAccessToken($request->access_token);
+
+         if($decode->type !== 'access_token'){
+             return response()->json([
+                'status' => 'invalid_type',
+                'message' => 'Invalid access token type'
+            ],401);
+         }
+
+         return response()->json([
+            'status' => 'success',
+            'message' => 'Token is valid'
+         ],200);
+
+
+        
         } catch (\Exception $error) {
             return response()->json([
                 'status' => 'database_error',

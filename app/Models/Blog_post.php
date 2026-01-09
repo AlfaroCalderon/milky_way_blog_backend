@@ -16,7 +16,8 @@ class Blog_post extends Model
         'summary',
         'author',
         'category',
-        'main_content'
+        'main_content',
+        'is_active'
     ];
 
     public function user():BelongsTo{
