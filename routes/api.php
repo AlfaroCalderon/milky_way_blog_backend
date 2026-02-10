@@ -29,4 +29,9 @@ Route::middleware('api.key')->group(function(){
             Route::patch('/delete/{id}',[BlogPostController::class, 'deletePost']);
         });
     });
+
+    Route::prefix('v1/auth_validation')->group(function() {
+        Route::post('/access_token', [UserController::class, 'validateAccessToken']);
+        Route::post('/refresh_token', [UserController::class, 'refreshToken']);
+    });
 });

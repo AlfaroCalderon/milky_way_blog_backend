@@ -25,7 +25,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'validation_error',
                 'message' => $validated->errors()
-            ], 422);
+            ], 401);
         }
 
         try {
@@ -127,7 +127,7 @@ class UserController extends Controller
             return response()->json([
               'status' => 'success',
               'message' => 'Login successful',
-              'dasta' => $token
+              'data' => $token
             ],200);
 
         } catch (\Exception $error) {
@@ -343,7 +343,7 @@ class UserController extends Controller
     }
 
     public function validateAccessToken(Request $request, JWTService $jWTService){
-        $validated = Validator::make($request->all, [
+        $validated = Validator::make($request->all(), [
             'access_token' => 'required|string'
         ]);
 
