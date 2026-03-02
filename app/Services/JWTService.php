@@ -16,7 +16,7 @@ class JWTService {
         $this->refreshSecretkey = config('app.key').'_refresh';
     }
 
-    public function generateToken(array $payload, int $expiresIn = 3600): string
+    public function generateToken(array $payload, int $expiresIn = 900): string
     {
         $issuedAt = time();
         $expires = $issuedAt + $expiresIn;
