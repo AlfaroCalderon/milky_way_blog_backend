@@ -76,7 +76,7 @@ class BlogPostController extends Controller
             $pagination = $request->input( 'per_page', 15);
             $search = $request->input('search');
 
-            $query = Blog_post::select('user_id','post_title','summary','author','category','img_url','created_at');
+            $query = Blog_post::select('user_id','post_title','summary','author','category', 'img_url','created_at');
 
             if ($search) {
                 $query->where(function($q) use ($search) {
@@ -107,7 +107,7 @@ class BlogPostController extends Controller
         try {
             $pagination = $request->input('per_page', 15);
 
-            $posts =  Blog_post::select('user_id','post_title','summary','author','category','img_url','created_at')->where('user_id','=',$id)->paginate($pagination);
+            $posts =  Blog_post::select('user_id','post_title','summary','author','category', 'main_content', 'img_url','created_at')->where('user_id','=',$id)->paginate($pagination);
 
             return response()->json([
                 'status' => 'success',
