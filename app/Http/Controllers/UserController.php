@@ -118,6 +118,8 @@ class UserController extends Controller
 
             $tokenPayload = [
                 'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_lastname' => $user->lastname,
                 'user_rol' => $user->roles,
                 'user_email' => $user->email
             ];
