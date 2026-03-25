@@ -14,7 +14,7 @@ Route::middleware('api.key')->group(function(){
             Route::get('/users',[UserController::class,'getAllUsers']);
             Route::get('/{id}',[UserController::class, 'getUserById']);
             Route::patch('/update/{id}',[UserController::class, 'updateUser']);
-            Route::patch('/delete/{id}', [UserController::class,'deleteUser']);
+            Route::delete('/delete/{id}', [UserController::class,'deleteUser']);
         });
     });
     Route::prefix('v1/blog')->group(function(){
@@ -26,7 +26,7 @@ Route::middleware('api.key')->group(function(){
             Route::post('/create',[BlogPostController::class, 'createBlogPost']);
             Route::get('/user_posts/{id}', [BlogPostController::class, 'getAllPostByUser']);
             Route::patch('/update/{id}',[BlogPostController::class, 'updatePost']);
-            Route::patch('/delete/{id}',[BlogPostController::class, 'deletePost']);
+            Route::delete('/delete/{id}',[BlogPostController::class, 'deletePost']);
         });
     });
 
