@@ -107,7 +107,7 @@ class BlogPostController extends Controller
         try {
             $pagination = $request->input('per_page', 15);
 
-            $posts =  Blog_post::select('user_id','post_title','summary','author','category', 'main_content', 'img_url','created_at')->where('user_id','=',$id)->paginate($pagination);
+            $posts =  Blog_post::select('id','user_id','post_title','summary','author','category', 'main_content', 'img_url','created_at')->where('user_id','=',$id)->paginate($pagination);
 
             return response()->json([
                 'status' => 'success',
