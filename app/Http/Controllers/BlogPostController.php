@@ -17,7 +17,7 @@ class BlogPostController extends Controller
             'post_title' => 'required|string|max:60|min:3',
             'summary' => 'required|string|max:150|min:3',
             'author' => 'required|string|max:100',
-            'category' => 'required|string|in:technology,science,lifestyle,travel',
+            'category' => 'required|string|in:technology,science,lifestyle,travel,education',
             'img_url' => 'nullable|string|max:2048',
             'main_content' => 'required|string|max:5000'
         ]);
@@ -123,7 +123,7 @@ class BlogPostController extends Controller
         }
     }
 
-    
+
 
     public function getPostById(int $id){
         try {
@@ -237,6 +237,35 @@ class BlogPostController extends Controller
         }
     }
 
+
+    public function activate(int $id){
+        try {
+
+            $post = Blog_post::find($id);
+
+            if(!$post){
+                return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'Post not found'
+                ],404);
+            }
+
+            $post->update(['is_active' => true]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Post has been activate',
+
+            ],200);
+
+        } catch (\Exception $error) {
+            return response()->json([
+                'status' => 'database_error',
+                'message' => 'An error has arisen '.$error->getMessage()
+            ],500);
+        }
+    }
+
     public function createComment(Request $request){
         $validated = Validator::make($request->all(),[
             'user_id' => 'required|integer|exists:users,id',
@@ -275,7 +304,7 @@ class BlogPostController extends Controller
                     'message' => 'Post not found'
                 ],404);
             }
-            
+
             $comment = Post_comment::create([
                 'user_id' => $request->user_id,
                 'post_id' => $request->post_id,
@@ -285,7 +314,7 @@ class BlogPostController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'The comment has been created',
-                'data' => $comment 
+                'data' => $comment
             ]);
 
         } catch (\Exception $error) {
@@ -298,7 +327,7 @@ class BlogPostController extends Controller
 
     public function getCommentsByPostId(int $id){
         try {
-            
+
             $comments = Post_comment::where('post_id', '=', $id)->get();
             $post = Blog_post::find($id);
 

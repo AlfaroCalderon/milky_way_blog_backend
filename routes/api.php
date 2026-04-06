@@ -26,6 +26,7 @@ Route::middleware('api.key')->group(function(){
             Route::post('/create',[BlogPostController::class, 'createBlogPost']);
             Route::get('/user_posts/{id}', [BlogPostController::class, 'getAllPostByUser']);
             Route::patch('/update/{id}',[BlogPostController::class, 'updatePost']);
+            Route::patch('/activate/{id}',[BlogPostController::class, 'activate']);
             Route::delete('/delete/{id}',[BlogPostController::class, 'deletePost']);
         });
     });
