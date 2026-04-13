@@ -328,7 +328,9 @@ class BlogPostController extends Controller
     public function getCommentsByPostId(int $id){
         try {
 
-            $comments = Post_comment::where('post_id', '=', $id)->get();
+            $comments = Post_comment::with(['user:id,name,lastname'])
+            ->where('post_id', '=', $id)
+            ->get();
             $post = Blog_post::find($id);
 
             if(!$post){
