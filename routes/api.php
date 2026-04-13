@@ -24,6 +24,8 @@ Route::middleware('api.key')->group(function(){
 
         Route::prefix('/management')->middleware('jwt.auth')->group(function(){
             Route::post('/create',[BlogPostController::class, 'createBlogPost']);
+            Route::post('/comment', [BlogPostController::class, 'createComment']);
+            Route::get('/comments/{id}', [BlogPostController::class, 'getCommentsByPostId']);
             Route::get('/user_posts/{id}', [BlogPostController::class, 'getAllPostByUser']);
             Route::patch('/update/{id}',[BlogPostController::class, 'updatePost']);
             Route::patch('/activate/{id}',[BlogPostController::class, 'activate']);
