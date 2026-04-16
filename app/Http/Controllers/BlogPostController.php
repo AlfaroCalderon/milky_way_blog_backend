@@ -157,7 +157,7 @@ class BlogPostController extends Controller
             'summary' => 'sometimes|string|max:150|min:3',
             'author' => 'sometimes|string|max:100',
             'category' => 'sometimes|string|in:technology,science,lifestyle,travel',
-            'img_url' => 'sometimes|string|max:2048',
+            'img_url' => 'nullable|string|max:2048',
             'main_content' => 'sometimes|string|max:5000'
         ]);
 
